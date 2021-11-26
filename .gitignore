@@ -1,0 +1,18 @@
+# Built application files
+*.apk
+*.aar
+*.ap_
+*.aab
+
+
+*.iml
+.gradle
+.idea
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+.DS_Store
+/build
+/.gradle
+/.idea
+/captures

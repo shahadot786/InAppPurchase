@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorBlack">#000000</color>
+    <color name="colorGreySoft">#BCBEC1</color>
+    <color name="colorGreyMedium">#96989A</color>
+    <color name="colorGreyDark">#797979</color>
+    <color name="colorCategory">#4aafff</color>
+    <color name="colorRipple">#636363</color>
+    <color name="colorOverlaySoft">#1A000000</color>
+    <color name="colorOverlayDark">#33000000</color>
+
+</resources>

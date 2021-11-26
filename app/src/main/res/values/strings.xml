@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Google In App Purchase</string>
+    <string name="copyright">Copyright © 2021 SHR_Creation. \nAll right reserved</string>
+    <string name="google_in_app_purchase">Google In App Purchase</string>
+    <string name="banner_ad">Banner Ad</string>
+    <string name="visible">Visible</string>
+    <string name="invisible">Invisible</string>
+    <string name="buy">BUY</string>
+    <string name="status">Status:</string>
+    <string name="show_ad">Show Ad</string>
+    <string name="remove_ad">Remove Ad</string>
+    <string name="subscribe">Subscribe</string>
+    <string name="play_console_license">MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAk4Xb6Rsc4AdJ2IaMMZolUlOGHCooOw9VKYthLBooYs20BD/zsEHPLvQiA6pbRxABMfofaUuxPWzwMlyc3rW191alvI23NRFlISA+2uXcj+IximV31n9qu54qE5HUJXKQfby7t78UxVMvbDzyKeFX8dviXvc0aHS10G17CqZ1hnYjfMx+23xiLGTAjhuB1kkdknECIzVxK14wGm7dcmbicwh8UYXwSGTnktECQAQB+pJoVi6l5z2AgBJC34h5UGjbutnfvlFPVoLcA7CNZn1YB2d7csmdMB1JxHVHMxQIb30boPbfdaHtHNcocWvBWNarv7+nNOX1ToEv3I6jLBbBaQIDAQAB</string>
+    <string name="product_id">test_subscribtion</string>
+    <string name="product_id2">subscription</string>
+
+
+</resources>
