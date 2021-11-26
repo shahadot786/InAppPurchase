@@ -56,14 +56,27 @@ public class MainActivity extends AppCompatActivity{
                                                     @Override
                                                     public void onAcknowledgePurchaseResponse(@NonNull BillingResult billingResult) {
                                                         if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK){
+                                                            Toast.makeText(MainActivity.this, "Purchase Acknowledge", Toast.LENGTH_SHORT).show();
                                                         }
                                                     }
                                                 }
                                         );
 
+                                        //other code here
                                         btnVisible.setVisibility(View.VISIBLE);
 
+                                        //successful message
+                                        Toast.makeText(MainActivity.this, "Welcome to Premium Version", Toast.LENGTH_SHORT).show();
+
                                     }
+                                }
+                            }
+                        }else{
+                            if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED){
+                                Toast.makeText(MainActivity.this, "Try Purchasing Again", Toast.LENGTH_SHORT).show();
+                            }else {
+                                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED){
+                                    Toast.makeText(MainActivity.this, "Already Purchased", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         }
@@ -99,6 +112,10 @@ public class MainActivity extends AppCompatActivity{
                                                     }
                                                 }
                                         );
+
+                                        //other codes here
+                                        btnVisible.setVisibility(View.VISIBLE);
+
                                     }
                                 }
                             }
@@ -128,7 +145,7 @@ public class MainActivity extends AppCompatActivity{
 
     private void getProductDetails(){
         List<String> productIds = new ArrayList<>();
-        productIds.add("one_time_purchase");
+        productIds.add("jscript_one");
         SkuDetailsParams getProductDetailsQuery = SkuDetailsParams
                 .newBuilder()
                 .setSkusList(productIds)
@@ -142,6 +159,7 @@ public class MainActivity extends AppCompatActivity{
                     public void onSkuDetailsResponse(@NonNull BillingResult billingResult, @Nullable List<SkuDetails> list) {
                         if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK &&
                         list != null){
+                            productIds.clear();
                             TextView itemName = findViewById(R.id.itemName);
                             Button buyNow = findViewById(R.id.buyNow);
                             SkuDetails itemInfo = list.get(0);
@@ -162,8 +180,5 @@ public class MainActivity extends AppCompatActivity{
                     }
                 }
         );
-
-
     }
-
 }
