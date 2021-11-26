@@ -30,12 +30,13 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity{
 
     BillingClient billingClient;
-    private Button button;
+    private Button button,btnVisible;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         button = findViewById(R.id.buyNow);
+        btnVisible = findViewById(R.id.btnVisible);
 
         billingClient = BillingClient.newBuilder(this)
                 .enablePendingPurchases()
@@ -46,7 +47,7 @@ public class MainActivity extends AppCompatActivity{
                             for (Purchase purchase: list){
                                 if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED)
                                 {
-                                    if (purchase.getSkus().equals(list)){
+                                    if (!purchase.isAcknowledged()){
                                         AcknowledgePurchaseParams acknowledgePurchaseParams
                                                 = AcknowledgePurchaseParams.newBuilder().setPurchaseToken(purchase.getPurchaseToken()).build();
                                         billingClient.acknowledgePurchase(
@@ -55,11 +56,13 @@ public class MainActivity extends AppCompatActivity{
                                                     @Override
                                                     public void onAcknowledgePurchaseResponse(@NonNull BillingResult billingResult) {
                                                         if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK){
-                                                            Toast.makeText(MainActivity.this, "Acknowledge", Toast.LENGTH_SHORT).show();
                                                         }
                                                     }
                                                 }
                                         );
+
+                                        btnVisible.setVisibility(View.VISIBLE);
+
                                     }
                                 }
                             }
@@ -82,7 +85,21 @@ public class MainActivity extends AppCompatActivity{
                         if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK){
                             for (Purchase purchase: list){
                                 if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED){
-
+                                    if (!purchase.isAcknowledged()){
+                                        AcknowledgePurchaseParams acknowledgePurchaseParams
+                                                = AcknowledgePurchaseParams.newBuilder().setPurchaseToken(purchase.getPurchaseToken()).build();
+                                        billingClient.acknowledgePurchase(
+                                                acknowledgePurchaseParams,
+                                                new AcknowledgePurchaseResponseListener() {
+                                                    @Override
+                                                    public void onAcknowledgePurchaseResponse(@NonNull BillingResult billingResult) {
+                                                        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK){
+                                                            Toast.makeText(MainActivity.this, "Acknowledge", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+                                                }
+                                        );
+                                    }
                                 }
                             }
                         }
@@ -111,7 +128,7 @@ public class MainActivity extends AppCompatActivity{
 
     private void getProductDetails(){
         List<String> productIds = new ArrayList<>();
-        productIds.add("test_buy_product");
+        productIds.add("one_time_purchase");
         SkuDetailsParams getProductDetailsQuery = SkuDetailsParams
                 .newBuilder()
                 .setSkusList(productIds)
