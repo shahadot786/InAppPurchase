@@ -47,12 +47,12 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
     ImageView lock_key;
     AdView removeAd;
     ActivityMainBinding binding;
-    TextView textStatus;
+    TextView textStatus,productName,productDescription,productPrice;
     Button btnSubscribe, btnUpgrade;
     private BillingClient billingClient;
     public static final String PREF_FILE = "MyPref";
-    public static final String PURCHASE_KEY = "java";
-    public static final String PRODUCT_ID = "java";
+    public static final String PURCHASE_KEY = "test_one";
+    public static final String PRODUCT_ID = "test_one";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +70,9 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
         removeAd = (AdView) findViewById(R.id.adView);
         //billing id
         textStatus = findViewById(R.id.tv_premium);
+        productName = findViewById(R.id.productName);
+        productDescription = findViewById(R.id.productDescription);
+        productPrice = findViewById(R.id.productPrice);
         btnSubscribe = findViewById(R.id.btn_subscribe);
         btnUpgrade = findViewById(R.id.btnUpgrade);
         //load ads
@@ -214,6 +217,10 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
                                                      List<SkuDetails> skuDetailsList) {
                         if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                             if (skuDetailsList != null && skuDetailsList.size() > 0) {
+                                /*SkuDetails itemInfo = skuDetailsList.get(0);
+                                productName.setText(itemInfo.getTitle());
+                                productDescription.setText(itemInfo.getDescription());
+                                productPrice.setText(itemInfo.getPrice());*/
                                 BillingFlowParams flowParams = BillingFlowParams.newBuilder()
                                         .setSkuDetails(skuDetailsList.get(0))
                                         .build();
@@ -315,6 +322,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
             }
         }
     };
+
 
     /**
      * Verifies that the purchase was signed correctly for this developer's public key.

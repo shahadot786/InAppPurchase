@@ -11,6 +11,9 @@
     <string name="remove_ad">Remove Ad</string>
     <string name="subscribe">Subscribe</string>
     <string name="play_console_license_key">MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAk4Xb6Rsc4AdJ2IaMMZolUlOGHCooOw9VKYthLBooYs20BD/zsEHPLvQiA6pbRxABMfofaUuxPWzwMlyc3rW191alvI23NRFlISA+2uXcj+IximV31n9qu54qE5HUJXKQfby7t78UxVMvbDzyKeFX8dviXvc0aHS10G17CqZ1hnYjfMx+23xiLGTAjhuB1kkdknECIzVxK14wGm7dcmbicwh8UYXwSGTnktECQAQB+pJoVi6l5z2AgBJC34h5UGjbutnfvlFPVoLcA7CNZn1YB2d7csmdMB1JxHVHMxQIb30boPbfdaHtHNcocWvBWNarv7+nNOX1ToEv3I6jLBbBaQIDAQAB</string>
+    <string name="product_name">Product Name:</string>
+    <string name="product_description">Product Description:</string>
+    <string name="product_price">Product Price:</string>
 
 
 </resources>

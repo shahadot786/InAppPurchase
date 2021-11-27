@@ -84,26 +84,61 @@
         app:layout_constraintTop_toTopOf="@+id/image1"
         app:srcCompat="@drawable/ic_baseline_lock_24" />
 
+    <TextView
+        android:id="@+id/productName"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text=""
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/image1"
+        app:layout_constraintStart_toStartOf="@+id/image1"
+        app:layout_constraintTop_toBottomOf="@+id/image1" />
+
+    <TextView
+        android:id="@+id/productDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:text=""
+        app:layout_constraintEnd_toEndOf="@+id/productName"
+        app:layout_constraintStart_toStartOf="@+id/productName"
+        app:layout_constraintTop_toBottomOf="@+id/productName" />
+
+    <TextView
+        android:id="@+id/productPrice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:text=""
+        app:layout_constraintEnd_toEndOf="@+id/productDescription"
+        app:layout_constraintStart_toStartOf="@+id/productDescription"
+        app:layout_constraintTop_toBottomOf="@+id/productDescription" />
+
     <Button
         android:id="@+id/btnUpgrade"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp"
         android:text="@string/buy"
-        app:layout_constraintEnd_toEndOf="@+id/image1"
-        app:layout_constraintStart_toStartOf="@+id/image1"
-        app:layout_constraintTop_toBottomOf="@+id/image1" />
+        app:layout_constraintBottom_toTopOf="@+id/btn_subscribe"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/btn_subscribe"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginBottom="32dp"
         android:text="@string/subscribe"
-        app:layout_constraintEnd_toEndOf="@+id/btnUpgrade"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@+id/btnUpgrade"
-        app:layout_constraintTop_toBottomOf="@+id/btnUpgrade" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/tv_premium"
