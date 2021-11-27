@@ -9,18 +9,18 @@
 
 
     <TextView
-        android:id="@+id/itemName"
+        android:id="@+id/item1Month"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="@+id/buyNow"
-        app:layout_constraintEnd_toStartOf="@+id/buyNow"
+        app:layout_constraintBottom_toBottomOf="@+id/btn1Months"
+        app:layout_constraintEnd_toStartOf="@+id/btn1Months"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/buyNow" />
+        app:layout_constraintTop_toTopOf="@+id/btn1Months" />
 
     <Button
-        android:id="@+id/buyNow"
+        android:id="@+id/btn1Months"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
@@ -29,15 +29,48 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/item6Month"
+        android:layout_width="200dp"
+        android:layout_height="19dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="@+id/btn6Months"
+        app:layout_constraintStart_toStartOf="@+id/item1Month"
+        app:layout_constraintTop_toTopOf="@+id/btn6Months" />
+
+
     <Button
-        android:id="@+id/btnVisible"
+        android:id="@+id/btn6Months"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="Button"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/item6Month"
+        app:layout_constraintTop_toBottomOf="@+id/btn1Months" />
+
+    <TextView
+        android:id="@+id/item12Month"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="@+id/btn12Months"
+        app:layout_constraintEnd_toStartOf="@+id/btn12Months"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/itemName" />
+        app:layout_constraintTop_toTopOf="@+id/btn12Months" />
+
+    <Button
+        android:id="@+id/btn12Months"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/item12Month"
+        app:layout_constraintTop_toBottomOf="@+id/btn6Months" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

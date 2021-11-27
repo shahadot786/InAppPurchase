@@ -30,13 +30,19 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity{
 
     BillingClient billingClient;
-    private Button button,btnVisible;
+    private Button btn1,btn6,btn12;
+    private TextView text1,text6,text12;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        button = findViewById(R.id.buyNow);
-        btnVisible = findViewById(R.id.btnVisible);
+        btn1 = findViewById(R.id.btn1Months);
+        btn6 = findViewById(R.id.btn6Months);
+        btn12 = findViewById(R.id.btn12Months);
+        text1 = findViewById(R.id.item1Month);
+        text6 = findViewById(R.id.item6Month);
+        text12 = findViewById(R.id.item12Month);
+
 
         billingClient = BillingClient.newBuilder(this)
                 .enablePendingPurchases()
@@ -62,8 +68,7 @@ public class MainActivity extends AppCompatActivity{
                                                 }
                                         );
 
-                                        //other code here
-                                        btnVisible.setVisibility(View.VISIBLE);
+
 
                                         //successful message
                                         Toast.makeText(MainActivity.this, "Welcome to Premium Version", Toast.LENGTH_SHORT).show();
@@ -113,9 +118,6 @@ public class MainActivity extends AppCompatActivity{
                                                 }
                                         );
 
-                                        //other codes here
-                                        btnVisible.setVisibility(View.VISIBLE);
-
                                     }
                                 }
                             }
@@ -145,7 +147,9 @@ public class MainActivity extends AppCompatActivity{
 
     private void getProductDetails(){
         List<String> productIds = new ArrayList<>();
-        productIds.add("jscript_one");
+        productIds.add("one_time_purchase");
+        /*productIds.add("js_6_months");
+        productIds.add("js_12_months");*/
         SkuDetailsParams getProductDetailsQuery = SkuDetailsParams
                 .newBuilder()
                 .setSkusList(productIds)
@@ -159,13 +163,10 @@ public class MainActivity extends AppCompatActivity{
                     public void onSkuDetailsResponse(@NonNull BillingResult billingResult, @Nullable List<SkuDetails> list) {
                         if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK &&
                         list != null){
-                            productIds.clear();
-                            TextView itemName = findViewById(R.id.itemName);
-                            Button buyNow = findViewById(R.id.buyNow);
                             SkuDetails itemInfo = list.get(0);
-                            itemName.setText(itemInfo.getTitle());
-                            buyNow.setText(itemInfo.getPrice());
-                            buyNow.setOnClickListener(
+                            text1.setText(itemInfo.getTitle());
+                            btn1.setText(itemInfo.getPrice());
+                            btn1.setOnClickListener(
                                     new View.OnClickListener() {
                                         @Override
                                         public void onClick(View view) {
@@ -181,4 +182,5 @@ public class MainActivity extends AppCompatActivity{
                 }
         );
     }
+    
 }
