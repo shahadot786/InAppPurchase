@@ -51,8 +51,8 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
     Button btnSubscribe, btnUpgrade;
     private BillingClient billingClient;
     public static final String PREF_FILE = "MyPref";
-    public static final String PURCHASE_KEY = "python";
-    public static final String PRODUCT_ID = "python";
+    public static final String PURCHASE_KEY = "java";
+    public static final String PRODUCT_ID = "java";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -235,6 +235,13 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
         //if item newly purchased
         if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && purchases != null) {
             handlePurchases(purchases);
+            //successful message
+            Toast.makeText(MainActivity.this, "Welcome to Premium Version", Toast.LENGTH_SHORT).show();
+            btnUpgrade.setVisibility(View.GONE);
+            textStatus.setText(getResources().getString(R.string.status_purchased));
+            removeAd.setVisibility(View.GONE);
+            hiddenView.setVisibility(View.GONE);
+            lock_key.setVisibility(View.GONE);
         }
         //if item already purchased then check and reflect changes
         else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
