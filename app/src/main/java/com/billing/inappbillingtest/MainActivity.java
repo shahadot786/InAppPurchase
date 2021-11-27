@@ -1,186 +1,92 @@
 package com.billing.inappbillingtest;
-import android.app.Activity;
+
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import com.billing.inappbillingtest.databinding.ActivityMainBinding;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 
-import com.android.billingclient.api.AcknowledgePurchaseParams;
-import com.android.billingclient.api.AcknowledgePurchaseResponseListener;
-import com.android.billingclient.api.BillingClient;
-import com.android.billingclient.api.BillingClientStateListener;
-import com.android.billingclient.api.BillingFlowParams;
-import com.android.billingclient.api.BillingResult;
-import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.PurchasesResponseListener;
-import com.android.billingclient.api.PurchasesUpdatedListener;
-import com.android.billingclient.api.SkuDetails;
-import com.android.billingclient.api.SkuDetailsParams;
-import com.android.billingclient.api.SkuDetailsResponseListener;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity{
 
-    BillingClient billingClient;
-    private Button btn1,btn6,btn12;
-    private TextView text1,text6,text12;
+    View hiddenView;
+    ImageView lock_key;
+    ActivityMainBinding binding;
+    TextView textStatus;
+    Button btnSubscribe;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        btn1 = findViewById(R.id.btn1Months);
-        btn6 = findViewById(R.id.btn6Months);
-        btn12 = findViewById(R.id.btn12Months);
-        text1 = findViewById(R.id.item1Month);
-        text6 = findViewById(R.id.item6Month);
-        text12 = findViewById(R.id.item12Month);
+        AdView adView = new AdView(this);
+        adView.setAdSize(AdSize.BANNER);
+        adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
+        //binding
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        //all the code bellow here
+        //find ID
+        hiddenView = (View)findViewById(R.id.hidden_view);
+        lock_key = (ImageView) findViewById(R.id.lock_key);
+        adView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
 
+        //billing id
+        textStatus = findViewById(R.id.tv_premium);
+        btnSubscribe = findViewById(R.id.btn_subscribe);
 
-        billingClient = BillingClient.newBuilder(this)
-                .enablePendingPurchases()
-                .setListener(new PurchasesUpdatedListener() {
-                    @Override
-                    public void onPurchasesUpdated(@NonNull BillingResult billingResult, @Nullable List<Purchase> list) {
-                        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && list != null){
-                            for (Purchase purchase: list){
-                                if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED)
-                                {
-                                    if (!purchase.isAcknowledged()){
-                                        AcknowledgePurchaseParams acknowledgePurchaseParams
-                                                = AcknowledgePurchaseParams.newBuilder().setPurchaseToken(purchase.getPurchaseToken()).build();
-                                        billingClient.acknowledgePurchase(
-                                                acknowledgePurchaseParams,
-                                                new AcknowledgePurchaseResponseListener() {
-                                                    @Override
-                                                    public void onAcknowledgePurchaseResponse(@NonNull BillingResult billingResult) {
-                                                        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK){
-                                                            Toast.makeText(MainActivity.this, "Purchase Acknowledge", Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    }
-                                                }
-                                        );
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(@NonNull InitializationStatus initializationStatus) {
 
+            }
+        });
 
+        adView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                // Code to be executed when an ad finishes loading.
+            }
 
-                                        //successful message
-                                        Toast.makeText(MainActivity.this, "Welcome to Premium Version", Toast.LENGTH_SHORT).show();
+            @Override
+            public void onAdFailedToLoad(LoadAdError adError) {
+                // Code to be executed when an ad request fails.
+            }
 
-                                    }
-                                }
-                            }
-                        }else{
-                            if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED){
-                                Toast.makeText(MainActivity.this, "Try Purchasing Again", Toast.LENGTH_SHORT).show();
-                            }else {
-                                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED){
-                                    Toast.makeText(MainActivity.this, "Already Purchased", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        }
-                    }
-                })
-                .build();
-        connectToGooglePlayBilling();
+            @Override
+            public void onAdOpened() {
+                // Code to be executed when an ad opens an overlay that
+                // covers the screen.
+            }
+
+            @Override
+            public void onAdClicked() {
+                // Code to be executed when the user clicks on an ad.
+            }
+
+            @Override
+            public void onAdClosed() {
+                // Code to be executed when the user is about to return
+                // to the app after tapping on an ad.
+            }
+        });
+
 
     }
 
-    @Override
-    protected void onResume(){
-        super.onResume();
-        billingClient.queryPurchasesAsync(
-                BillingClient.SkuType.INAPP,
-                new PurchasesResponseListener() {
-                    @Override
-                    public void onQueryPurchasesResponse(@NonNull BillingResult billingResult, @NonNull List<Purchase> list) {
-                        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK){
-                            for (Purchase purchase: list){
-                                if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED){
-                                    if (!purchase.isAcknowledged()){
-                                        AcknowledgePurchaseParams acknowledgePurchaseParams
-                                                = AcknowledgePurchaseParams.newBuilder().setPurchaseToken(purchase.getPurchaseToken()).build();
-                                        billingClient.acknowledgePurchase(
-                                                acknowledgePurchaseParams,
-                                                new AcknowledgePurchaseResponseListener() {
-                                                    @Override
-                                                    public void onAcknowledgePurchaseResponse(@NonNull BillingResult billingResult) {
-                                                        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK){
-                                                            Toast.makeText(MainActivity.this, "Acknowledge", Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    }
-                                                }
-                                        );
-
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-        );
-    }
-
-    private void connectToGooglePlayBilling(){
-        billingClient.startConnection(
-                new BillingClientStateListener() {
-                    @Override
-                    public void onBillingServiceDisconnected() {
-                        connectToGooglePlayBilling();
-                    }
-
-                    @Override
-                    public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
-                        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK){
-                            getProductDetails();
-                        }
-                    }
-                }
-        );
-    }
-
-    private void getProductDetails(){
-        List<String> productIds = new ArrayList<>();
-        productIds.add("one_time_purchase");
-        /*productIds.add("js_6_months");
-        productIds.add("js_12_months");*/
-        SkuDetailsParams getProductDetailsQuery = SkuDetailsParams
-                .newBuilder()
-                .setSkusList(productIds)
-                .setType(BillingClient.SkuType.INAPP)
-                .build();
-        Activity activity = this;
-        billingClient.querySkuDetailsAsync(
-                getProductDetailsQuery,
-                new SkuDetailsResponseListener() {
-                    @Override
-                    public void onSkuDetailsResponse(@NonNull BillingResult billingResult, @Nullable List<SkuDetails> list) {
-                        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK &&
-                        list != null){
-                            SkuDetails itemInfo = list.get(0);
-                            text1.setText(itemInfo.getTitle());
-                            btn1.setText(itemInfo.getPrice());
-                            btn1.setOnClickListener(
-                                    new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View view) {
-                                            billingClient.launchBillingFlow(
-                                                    activity,
-                                                    BillingFlowParams.newBuilder().setSkuDetails(itemInfo).build()
-                                            );
-                                        }
-                                    }
-                            );
-                        }
-                    }
-                }
-        );
-    }
-    
 }
