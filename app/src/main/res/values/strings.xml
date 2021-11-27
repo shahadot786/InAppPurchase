@@ -7,14 +7,13 @@
     <string name="banner_ad">Banner Ad</string>
     <string name="visible">Visible</string>
     <string name="invisible">Invisible</string>
-    <string name="buy">BUY</string>
-    <string name="status">Status:</string>
+    <string name="buy">Upgrade</string>
+    <string name="status_purchased">Status : Purchased</string>
+    <string name="status_not_purchased">Status : Not Purchased</string>
     <string name="show_ad">Show Ad</string>
     <string name="remove_ad">Remove Ad</string>
     <string name="subscribe">Subscribe</string>
-    <string name="play_console_license">MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAk4Xb6Rsc4AdJ2IaMMZolUlOGHCooOw9VKYthLBooYs20BD/zsEHPLvQiA6pbRxABMfofaUuxPWzwMlyc3rW191alvI23NRFlISA+2uXcj+IximV31n9qu54qE5HUJXKQfby7t78UxVMvbDzyKeFX8dviXvc0aHS10G17CqZ1hnYjfMx+23xiLGTAjhuB1kkdknECIzVxK14wGm7dcmbicwh8UYXwSGTnktECQAQB+pJoVi6l5z2AgBJC34h5UGjbutnfvlFPVoLcA7CNZn1YB2d7csmdMB1JxHVHMxQIb30boPbfdaHtHNcocWvBWNarv7+nNOX1ToEv3I6jLBbBaQIDAQAB</string>
-    <string name="product_id">test_subscribtion</string>
-    <string name="product_id2">subscription</string>
+    <string name="play_console_license_key">MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAk4Xb6Rsc4AdJ2IaMMZolUlOGHCooOw9VKYthLBooYs20BD/zsEHPLvQiA6pbRxABMfofaUuxPWzwMlyc3rW191alvI23NRFlISA+2uXcj+IximV31n9qu54qE5HUJXKQfby7t78UxVMvbDzyKeFX8dviXvc0aHS10G17CqZ1hnYjfMx+23xiLGTAjhuB1kkdknECIzVxK14wGm7dcmbicwh8UYXwSGTnktECQAQB+pJoVi6l5z2AgBJC34h5UGjbutnfvlFPVoLcA7CNZn1YB2d7csmdMB1JxHVHMxQIb30boPbfdaHtHNcocWvBWNarv7+nNOX1ToEv3I6jLBbBaQIDAQAB</string>
 
 
 </resources>
