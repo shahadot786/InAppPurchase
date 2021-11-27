@@ -111,33 +111,6 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
                 // to the app after tapping on an ad.
             }
         });
-        //button on click method
-        binding.visible.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                hiddenView.setVisibility(View.GONE);
-                lock_key.setVisibility(View.GONE);
-            }
-        });
-        binding.inVisible.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                hiddenView.setVisibility(View.VISIBLE);
-                lock_key.setVisibility(View.VISIBLE);
-            }
-        });
-        binding.adInvisible.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                removeAd.setVisibility(View.GONE);
-            }
-        });
-        binding.adVisible.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                removeAd.setVisibility(View.VISIBLE);
-            }
-        });
         //billing client listener
         billingClient = BillingClient.newBuilder(this)
                 .enablePendingPurchases().setListener(this).build();
