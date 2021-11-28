@@ -1,4 +1,5 @@
 package com.billing.inappbillingtest;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.SharedPreferences;
@@ -14,6 +15,7 @@ import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingFlowParams;
 import com.android.billingclient.api.BillingResult;
 import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.PurchasesResponseListener;
 import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.SkuDetails;
 import com.android.billingclient.api.SkuDetailsParams;
@@ -27,7 +29,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
 
     public static final String PREF_FILE= "MyPref";
     public static final String SUBSCRIBE_KEY= "subscribe";
-    public static final String ITEM_SKU_SUBSCRIBE= "js_6_months";
+    public static final String ITEM_SKU_SUBSCRIBE= "js_1_month";
 
     TextView premiumContent,subscriptionStatus;
     Button subscribe;
@@ -49,20 +51,23 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
         billingClient = BillingClient.newBuilder(this).enablePendingPurchases().setListener(this).build();
         billingClient.startConnection(new BillingClientStateListener() {
             @Override
-            public void onBillingSetupFinished(BillingResult billingResult) {
+            public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
                 if(billingResult.getResponseCode()==BillingClient.BillingResponseCode.OK){
-                    Purchase.PurchasesResult queryPurchase = billingClient.queryPurchases(SUBS);
-                    List<Purchase> queryPurchases = queryPurchase.getPurchasesList();
-                    if(queryPurchases!=null && queryPurchases.size()>0){
-                        handlePurchases(queryPurchases);
-                    }
-                    //if no item in purchase list means subscription is not subscribed
-                    //Or subscription is cancelled and not renewed for next month
-                    // so update pref in both cases
-                    // so next time on app launch our premium content will be locked
-                    else{
-                        saveSubscribeValueToPref(false);
-                    }
+                    billingClient.queryPurchasesAsync(SUBS, new PurchasesResponseListener() {
+                        @Override
+                        public void onQueryPurchasesResponse(@NonNull BillingResult billingResult, @NonNull List<Purchase> myPurchase) {
+                            if (!myPurchase.isEmpty()){
+                                handlePurchases(myPurchase);
+                            }
+                            //if no item in purchase list means subscription is not subscribed
+                            //Or subscription is cancelled and not renewed for next month
+                            // so update pref in both cases
+                            // so next time on app launch our premium content will be locked
+                            else{
+                                saveSubscribeValueToPref(false);
+                            }
+                        }
+                    });
                 }
             }
 
@@ -111,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
             billingClient = BillingClient.newBuilder(this).enablePendingPurchases().setListener(this).build();
             billingClient.startConnection(new BillingClientStateListener() {
                 @Override
-                public void onBillingSetupFinished(BillingResult billingResult) {
+                public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
                     if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                         initiatePurchase();
                     } else {
@@ -135,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
             billingClient.querySkuDetailsAsync(params.build(),
                     new SkuDetailsResponseListener() {
                         @Override
-                        public void onSkuDetailsResponse(BillingResult billingResult,
+                        public void onSkuDetailsResponse(@NonNull BillingResult billingResult,
                                                          List<SkuDetails> skuDetailsList) {
                             if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                                 if (skuDetailsList != null && skuDetailsList.size() > 0) {
@@ -167,15 +172,19 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
         }
         //if item already subscribed then check and reflect changes
         else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
-            Purchase.PurchasesResult queryAlreadyPurchasesResult = billingClient.queryPurchases(SUBS);
-            List<Purchase> alreadyPurchases = queryAlreadyPurchasesResult.getPurchasesList();
-            if(alreadyPurchases!=null){
-                handlePurchases(alreadyPurchases);
-                //other codes
-                subscribe.setVisibility(View.GONE);
-                premiumContent.setVisibility(View.VISIBLE);
-                subscriptionStatus.setText("Subscription Status : Subscribed");
-            }
+
+            billingClient.queryPurchasesAsync(SUBS, new PurchasesResponseListener() {
+                @Override
+                public void onQueryPurchasesResponse(@NonNull BillingResult billingResult, @NonNull List<Purchase> alreadyPurchases) {
+                    if (!alreadyPurchases.isEmpty()){
+                        handlePurchases(alreadyPurchases);
+                        //other codes
+                        subscribe.setVisibility(View.GONE);
+                        premiumContent.setVisibility(View.VISIBLE);
+                        subscriptionStatus.setText("Subscription Status : Subscribed");
+                    }
+                }
+            });
         }
         //if Purchase canceled
         else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
