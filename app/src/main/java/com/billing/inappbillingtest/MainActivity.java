@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
 
     public static final String PREF_FILE= "MyPref";
     public static final String SUBSCRIBE_KEY= "subscribe";
-    public static final String ITEM_SKU_SUBSCRIBE= "monthly";
+    public static final String ITEM_SKU_SUBSCRIBE= "yearly_50_off";
 
     TextView textStatus;
     View lockView;
@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
         });
         //ad request
         AdRequest adRequest = new AdRequest.Builder().build();
-        adView.loadAd(adRequest);
+        adRemove.loadAd(adRequest);
         //ad click listener
         adView.setAdListener(new AdListener() {
             @Override
@@ -134,12 +134,40 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
             }
         });
 
+        subscribe.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //check if service is already connected
+                if (billingClient.isReady()) {
+                    initiatePurchase();
+                }
+                //else reconnect service
+                else{
+                    billingClient = BillingClient.newBuilder(MainActivity.this).enablePendingPurchases().setListener(MainActivity.this).build();
+                    billingClient.startConnection(new BillingClientStateListener() {
+                        @Override
+                        public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
+                            if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                                initiatePurchase();
+                            } else {
+                                Toast.makeText(getApplicationContext(),"Error "+billingResult.getDebugMessage(),Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                        @Override
+                        public void onBillingServiceDisconnected() {
+                            Toast.makeText(getApplicationContext(),"Service Disconnected ",Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+        });
+
         //item subscribed
         if(getSubscribeValueFromPref()){
             subscribe.setVisibility(View.GONE);
             lockView.setVisibility(View.GONE);
             ic_lock_premium_key.setVisibility(View.GONE);
-            adView.setVisibility(View.GONE);
+            adRemove.setVisibility(View.GONE);
             textStatus.setText(getResources().getString(R.string.upgrade_premium));
         }
         //item not subscribed
@@ -147,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
             subscribe.setVisibility(View.VISIBLE);
             lockView.setVisibility(View.VISIBLE);
             ic_lock_premium_key.setVisibility(View.VISIBLE);
-            adView.setVisibility(View.VISIBLE);
+            adRemove.setVisibility(View.VISIBLE);
             textStatus.setText(getResources().getString(R.string.free_content));
         }
     }
@@ -166,31 +194,6 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
         getPreferenceEditObject().putBoolean(SUBSCRIBE_KEY,value).commit();
     }
 
-    //initiate purchase on button click
-    public void subscribe(View view) {
-        //check if service is already connected
-        if (billingClient.isReady()) {
-            initiatePurchase();
-        }
-        //else reconnect service
-        else{
-            billingClient = BillingClient.newBuilder(this).enablePendingPurchases().setListener(this).build();
-            billingClient.startConnection(new BillingClientStateListener() {
-                @Override
-                public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
-                    if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                        initiatePurchase();
-                    } else {
-                        Toast.makeText(getApplicationContext(),"Error "+billingResult.getDebugMessage(),Toast.LENGTH_SHORT).show();
-                    }
-                }
-                @Override
-                public void onBillingServiceDisconnected() {
-                    Toast.makeText(getApplicationContext(),"Service Disconnected ",Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-    }
     private void initiatePurchase() {
         List<String> skuList = new ArrayList<>();
         skuList.add(ITEM_SKU_SUBSCRIBE);
