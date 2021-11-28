@@ -15,7 +15,8 @@
     <string name="product_name">Product Name:</string>
     <string name="product_description">Product Description:</string>
     <string name="product_price">Product Price:</string>
-    <string name="in_app_single_subscription">In App Single Subscription</string>
+    <string name="in_app_single_subscription_yearly">In App Single Subscription Yearly</string>
+    <string name="in_app_single_subscription_monthly">In App Single Subscription Monthly</string>
     <string name="premium_content">Premium Content</string>
     <string name="upgrade_premium">Status : Premium</string>
     <string name="free_content">Status : Free</string>
