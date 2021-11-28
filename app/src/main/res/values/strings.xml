@@ -4,6 +4,7 @@
     <string name="app_name">Google In App Purchase</string>
     <string name="copyright">Copyright © 2021 SHR_Creation. \nAll right reserved</string>
     <string name="google_in_app_purchase">Google In App Purchase</string>
+    <string name="ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
     <string name="banner_ad">Banner Ad</string>
     <string name="buy">Upgrade</string>
     <string name="status_purchased">Status : Purchased</string>
@@ -14,7 +15,10 @@
     <string name="product_name">Product Name:</string>
     <string name="product_description">Product Description:</string>
     <string name="product_price">Product Price:</string>
-
+    <string name="in_app_single_subscription">In App Single Subscription</string>
+    <string name="premium_content">Premium Content</string>
+    <string name="upgrade_premium">Status : Premium</string>
+    <string name="free_content">Status : Free</string>
 
 
 </resources>

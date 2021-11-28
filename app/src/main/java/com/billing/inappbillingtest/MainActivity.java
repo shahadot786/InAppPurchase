@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.android.billingclient.api.AcknowledgePurchaseParams;
@@ -20,6 +21,15 @@ import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.SkuDetails;
 import com.android.billingclient.api.SkuDetailsParams;
 import com.android.billingclient.api.SkuDetailsResponseListener;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +39,12 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
 
     public static final String PREF_FILE= "MyPref";
     public static final String SUBSCRIBE_KEY= "subscribe";
-    public static final String ITEM_SKU_SUBSCRIBE= "js_1_month";
+    public static final String ITEM_SKU_SUBSCRIBE= "monthly";
 
-    TextView premiumContent,subscriptionStatus;
+    TextView textStatus;
+    View lockView;
+    ImageView ic_lock_premium_key;
+    AdView adView;
     Button subscribe;
 
     private BillingClient billingClient;
@@ -41,9 +54,52 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        premiumContent = (TextView) findViewById(R.id.premium_content);
-        subscriptionStatus=(TextView) findViewById(R.id.subscription_status);
-        subscribe=(Button) findViewById(R.id.subscribe);
+        textStatus = (TextView) findViewById(R.id.textStatus);
+        lockView = (View) findViewById(R.id.lockView);
+        ic_lock_premium_key = (ImageView) findViewById(R.id.ic_lock_premium_key);
+        adView = (AdView) findViewById(R.id.adView);
+        subscribe=(Button) findViewById(R.id.btnSubscribe);
+        //ad declarations
+        adView.setAdSize(AdSize.BANNER);
+        adView.setAdUnitId(getResources().getString(R.string.ad_unit_id));
+        //load ad
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(@NonNull InitializationStatus initializationStatus) {
+            }
+        });
+        //ad request
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
+        //ad click listener
+        adView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                // Code to be executed when an ad finishes loading.
+            }
+
+            @Override
+            public void onAdFailedToLoad(LoadAdError adError) {
+                // Code to be executed when an ad request fails.
+            }
+
+            @Override
+            public void onAdOpened() {
+                // Code to be executed when an ad opens an overlay that
+                // covers the screen.
+            }
+
+            @Override
+            public void onAdClicked() {
+                // Code to be executed when the user clicks on an ad.
+            }
+
+            @Override
+            public void onAdClosed() {
+                // Code to be executed when the user is about to return
+                // to the app after tapping on an ad.
+            }
+        });
 
         // Establish connection to billing client
         //check subscription status from google play store cache
@@ -80,14 +136,18 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
         //item subscribed
         if(getSubscribeValueFromPref()){
             subscribe.setVisibility(View.GONE);
-            premiumContent.setVisibility(View.VISIBLE);
-            subscriptionStatus.setText("Subscription Status : Subscribed");
+            lockView.setVisibility(View.GONE);
+            ic_lock_premium_key.setVisibility(View.GONE);
+            adView.setVisibility(View.GONE);
+            textStatus.setText(getResources().getString(R.string.upgrade_premium));
         }
         //item not subscribed
         else{
-            premiumContent.setVisibility(View.GONE);
             subscribe.setVisibility(View.VISIBLE);
-            subscriptionStatus.setText("Subscription Status : Not Subscribed");
+            lockView.setVisibility(View.VISIBLE);
+            ic_lock_premium_key.setVisibility(View.VISIBLE);
+            adView.setVisibility(View.VISIBLE);
+            textStatus.setText(getResources().getString(R.string.free_content));
         }
     }
 
@@ -171,8 +231,10 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
             handlePurchases(purchases);
             //other codes
             subscribe.setVisibility(View.GONE);
-            premiumContent.setVisibility(View.VISIBLE);
-            subscriptionStatus.setText("Subscription Status : Subscribed");
+            lockView.setVisibility(View.GONE);
+            ic_lock_premium_key.setVisibility(View.GONE);
+            adView.setVisibility(View.GONE);
+            textStatus.setText(getResources().getString(R.string.upgrade_premium));
         }
         //if item already subscribed then check and reflect changes
         else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
@@ -236,9 +298,11 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
             else if(ITEM_SKU_SUBSCRIBE.equals(purchase.getSkus().get(0)) && purchase.getPurchaseState() == Purchase.PurchaseState.UNSPECIFIED_STATE)
             {
                 saveSubscribeValueToPref(false);
-                premiumContent.setVisibility(View.GONE);
                 subscribe.setVisibility(View.VISIBLE);
-                subscriptionStatus.setText("Subscription Status : Not Subscribed");
+                lockView.setVisibility(View.VISIBLE);
+                ic_lock_premium_key.setVisibility(View.VISIBLE);
+                adView.setVisibility(View.VISIBLE);
+                textStatus.setText(getResources().getString(R.string.free_content));
                 Toast.makeText(getApplicationContext(), "Purchase Status Unknown", Toast.LENGTH_SHORT).show();
             }
         }
