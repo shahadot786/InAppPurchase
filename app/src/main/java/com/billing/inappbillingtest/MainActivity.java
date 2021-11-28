@@ -2,12 +2,16 @@ package com.billing.inappbillingtest;
 
 
 import static com.android.billingclient.api.BillingClient.SkuType.INAPP;
+import static com.android.billingclient.api.BillingClient.SkuType.SUBS;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,8 +55,14 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
     Button btnSubscribe, btnUpgrade;
     private BillingClient billingClient;
     public static final String PREF_FILE = "MyPref";
-    public static final String PURCHASE_KEY = "test_one";
-    public static final String PRODUCT_ID = "test_one";
+    private static ArrayList<String> subcribeItemIDs = new ArrayList<String>() {{
+        add("js_1_month");
+        add("js_6_months");
+        add("js_12_months");
+    }};
+    private static ArrayList<String> subscribeItemDisplay = new ArrayList<String>();
+    ArrayAdapter<String> arrayAdapter;
+    ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +78,8 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
         hiddenView = (View) findViewById(R.id.hidden_view);
         lock_key = (ImageView) findViewById(R.id.lock_key);
         removeAd = (AdView) findViewById(R.id.adView);
+        //list view
+        listView = findViewById(R.id.listView);
         //billing id
         textStatus = findViewById(R.id.tv_premium);
         productName = findViewById(R.id.productName);
@@ -114,51 +126,101 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
                 // to the app after tapping on an ad.
             }
         });
-        //billing client listener
+        // Establish connection to billing client
+        //check purchase status from google play store cache on every app start
         billingClient = BillingClient.newBuilder(this)
                 .enablePendingPurchases().setListener(this).build();
         billingClient.startConnection(new BillingClientStateListener() {
             @Override
-            public void onBillingSetupFinished(BillingResult billingResult) {
-                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                    Purchase.PurchasesResult queryPurchase = billingClient.queryPurchases(INAPP);
+            public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
+
+                if(billingResult.getResponseCode()==BillingClient.BillingResponseCode.OK){
+                    Purchase.PurchasesResult queryPurchase = billingClient.queryPurchases(SUBS);
                     List<Purchase> queryPurchases = queryPurchase.getPurchasesList();
-                    if (queryPurchases != null && queryPurchases.size() > 0) {
+                    if(queryPurchases!=null && queryPurchases.size()>0){
                         handlePurchases(queryPurchases);
                     }
-                    //if purchase list is empty that means item is not purchased
-                    //Or purchase is refunded or canceled
-                    else {
-                        savePurchaseValueToPref(false);
+
+                    //check which items are in purchase list and which are not in purchase list
+                    //if items that are found add them to purchaseFound
+                    //check status of found items and save values to preference
+                    //item which are not found simply save false values to their preference
+                    //indexOf return index of item in purchase list from 0-2 (because we have 3 items) else returns -1 if not found
+                    ArrayList<Integer> purchaseFound =new ArrayList<Integer> ();
+                    if(queryPurchases!=null && queryPurchases.size()>0){
+                        //check item in purchase list
+                        for(Purchase p:queryPurchases){
+                            int index=subcribeItemIDs.indexOf(p.getSkus());
+                            //if purchase found
+                            if(index>-1)
+                            {
+                                purchaseFound.add(index);
+                                if(p.getPurchaseState() == Purchase.PurchaseState.PURCHASED)
+                                {
+                                    saveSubscribeItemValueToPref(subcribeItemIDs.get(index),true);
+                                }
+                                else{
+                                    saveSubscribeItemValueToPref(subcribeItemIDs.get(index),false);
+                                }
+                            }
+                        }
+                        //items that are not found in purchase list mark false
+                        //indexOf returns -1 when item is not in foundlist
+                        for(int i=0;i < subcribeItemIDs.size(); i++){
+                            if(purchaseFound.indexOf(i)==-1){
+                                saveSubscribeItemValueToPref(subcribeItemIDs.get(i),false);
+                            }
+                        }
                     }
+                    //if purchase list is empty that means no item is not purchased/Subscribed
+                    //Or purchase is refunded or canceled
+                    //so mark them all false
+                    else{
+                        for( String purchaseItem: subcribeItemIDs ){
+                            saveSubscribeItemValueToPref(purchaseItem,false);
+                        }
+                    }
+
                 }
+
             }
 
             @Override
             public void onBillingServiceDisconnected() {
             }
         });
-        //initiate purchase on button click
-        btnUpgrade.setOnClickListener(new View.OnClickListener() {
+
+
+        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, subscribeItemDisplay);
+        listView.setAdapter(arrayAdapter);
+        notifyList();
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+
+                if(getSubscribeItemValueFromPref(subcribeItemIDs.get(position))){
+                    Toast.makeText(getApplicationContext(),subcribeItemIDs.get(position)+" is Already Subscribed",Toast.LENGTH_SHORT).show();
+                    //selected item is already purchased/subscribed
+                    return;
+                }
+                //initiate purchase on selected product/subscribe item click
                 //check if service is already connected
                 if (billingClient.isReady()) {
-                    initiatePurchase();
+                    initiatePurchase(subcribeItemIDs.get(position));
                 }
                 //else reconnect service
-                else {
+                else{
                     billingClient = BillingClient.newBuilder(MainActivity.this).enablePendingPurchases().setListener(MainActivity.this).build();
                     billingClient.startConnection(new BillingClientStateListener() {
                         @Override
-                        public void onBillingSetupFinished(BillingResult billingResult) {
+                        public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
                             if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                                initiatePurchase();
+                                initiatePurchase(subcribeItemIDs.get(position));
                             } else {
-                                Toast.makeText(getApplicationContext(), "Error " + billingResult.getDebugMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(),"Error "+billingResult.getDebugMessage(),Toast.LENGTH_SHORT).show();
                             }
                         }
-
                         @Override
                         public void onBillingServiceDisconnected() {
                         }
@@ -167,74 +229,68 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
             }
         });
 
-        //item Purchased
-        if (getPurchaseValueFromPref()) {
-            btnUpgrade.setVisibility(View.GONE);
-            textStatus.setText(getResources().getString(R.string.status_purchased));
-            removeAd.setVisibility(View.GONE);
-            hiddenView.setVisibility(View.GONE);
-            lock_key.setVisibility(View.GONE);
-        }
-        //item not Purchased
-        else {
-            btnUpgrade.setVisibility(View.VISIBLE);
-            textStatus.setText(getResources().getString(R.string.status_not_purchased));
-            removeAd.setVisibility(View.VISIBLE);
-            hiddenView.setVisibility(View.VISIBLE);
-            lock_key.setVisibility(View.VISIBLE);
-        }
-
     }//end of OnCreate
 
     //other codes bellow here
 
+    private void notifyList(){
+        subscribeItemDisplay.clear();
+        for(String p:subcribeItemIDs){
+            subscribeItemDisplay.add("Subscribe Status of "+p+" = "+getSubscribeItemValueFromPref(p));
+        }
+        arrayAdapter.notifyDataSetChanged();
+    }
+
     private SharedPreferences getPreferenceObject() {
         return getApplicationContext().getSharedPreferences(PREF_FILE, 0);
     }
-
     private SharedPreferences.Editor getPreferenceEditObject() {
         SharedPreferences pref = getApplicationContext().getSharedPreferences(PREF_FILE, 0);
         return pref.edit();
     }
-
-    private boolean getPurchaseValueFromPref() {
-        return getPreferenceObject().getBoolean(PURCHASE_KEY, false);
+    private boolean getSubscribeItemValueFromPref(String PURCHASE_KEY){
+        return getPreferenceObject().getBoolean(PURCHASE_KEY,false);
+    }
+    private void saveSubscribeItemValueToPref(String PURCHASE_KEY,boolean value){
+        getPreferenceEditObject().putBoolean(PURCHASE_KEY,value).commit();
     }
 
-    private void savePurchaseValueToPref(boolean value) {
-        getPreferenceEditObject().putBoolean(PURCHASE_KEY, value).commit();
-    }
 
-    private void initiatePurchase() {
+    private void initiatePurchase(final String PRODUCT_ID) {
         List<String> skuList = new ArrayList<>();
         skuList.add(PRODUCT_ID);
         SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
-        params.setSkusList(skuList).setType(INAPP);
-        billingClient.querySkuDetailsAsync(params.build(),
-                new SkuDetailsResponseListener() {
-                    @Override
-                    public void onSkuDetailsResponse(BillingResult billingResult,
-                                                     List<SkuDetails> skuDetailsList) {
-                        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                            if (skuDetailsList != null && skuDetailsList.size() > 0) {
-                                /*SkuDetails itemInfo = skuDetailsList.get(0);
-                                productName.setText(itemInfo.getTitle());
-                                productDescription.setText(itemInfo.getDescription());
-                                productPrice.setText(itemInfo.getPrice());*/
-                                BillingFlowParams flowParams = BillingFlowParams.newBuilder()
-                                        .setSkuDetails(skuDetailsList.get(0))
-                                        .build();
-                                billingClient.launchBillingFlow(MainActivity.this, flowParams);
+        params.setSkusList(skuList).setType(SUBS);
+
+        BillingResult billingResult = billingClient.isFeatureSupported(BillingClient.FeatureType.SUBSCRIPTIONS);
+
+        if(billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+            billingClient.querySkuDetailsAsync(params.build(),
+                    new SkuDetailsResponseListener() {
+                        @Override
+                        public void onSkuDetailsResponse(@NonNull BillingResult billingResult,
+                                                         List<SkuDetails> skuDetailsList) {
+                            if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                                if (skuDetailsList != null && skuDetailsList.size() > 0) {
+                                    BillingFlowParams flowParams = BillingFlowParams.newBuilder()
+                                            .setSkuDetails(skuDetailsList.get(0))
+                                            .build();
+                                    billingClient.launchBillingFlow(MainActivity.this, flowParams);
+                                } else {
+                                    //try to add item/product id "s1" "s2" "s3" inside subscription in google play console
+                                    Toast.makeText(getApplicationContext(), "Subscribe Item " + PRODUCT_ID + " not Found", Toast.LENGTH_SHORT).show();
+                                }
                             } else {
-                                //try to add item/product id "purchase" inside managed product in google play console
-                                Toast.makeText(getApplicationContext(), "Purchase Item not Found", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(),
+                                        " Error " + billingResult.getDebugMessage(), Toast.LENGTH_SHORT).show();
                             }
-                        } else {
-                            Toast.makeText(getApplicationContext(),
-                                    " Error " + billingResult.getDebugMessage(), Toast.LENGTH_SHORT).show();
                         }
-                    }
-                });
+                    });
+        }
+        else{
+            Toast.makeText(getApplicationContext(),
+                    "Sorry Subscription not Supported. Please Update Play Store", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -242,86 +298,92 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
         //if item newly purchased
         if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && purchases != null) {
             handlePurchases(purchases);
-            //successful message
-            Toast.makeText(MainActivity.this, "Welcome to Premium Version", Toast.LENGTH_SHORT).show();
-            btnUpgrade.setVisibility(View.GONE);
-            textStatus.setText(getResources().getString(R.string.status_purchased));
-            removeAd.setVisibility(View.GONE);
-            hiddenView.setVisibility(View.GONE);
-            lock_key.setVisibility(View.GONE);
         }
         //if item already purchased then check and reflect changes
         else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
-            Purchase.PurchasesResult queryAlreadyPurchasesResult = billingClient.queryPurchases(INAPP);
-
+            Purchase.PurchasesResult queryAlreadyPurchasesResult = billingClient.queryPurchases(SUBS);
+            List<Purchase> alreadyPurchases = queryAlreadyPurchasesResult.getPurchasesList();
+            if(alreadyPurchases!=null){
+                handlePurchases(alreadyPurchases);
+            }
         }
         //if purchase cancelled
         else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
-            Toast.makeText(getApplicationContext(), "Purchase Canceled", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),"Purchase Canceled",Toast.LENGTH_SHORT).show();
         }
         // Handle any other error msgs
         else {
-            Toast.makeText(getApplicationContext(), "Error " + billingResult.getDebugMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),"Error "+billingResult.getDebugMessage(),Toast.LENGTH_SHORT).show();
         }
     }
+    void handlePurchases(List<Purchase>  purchases) {
+        for(Purchase purchase:purchases) {
 
-    void handlePurchases(List<Purchase> purchases) {
-        for (Purchase purchase : purchases) {
-            //if item is purchased
-            if (PRODUCT_ID.equals(purchase.getSkus().get(0)) && purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
-                if (!verifyValidSignature(purchase.getOriginalJson(), purchase.getSignature())) {
-                    // Invalid purchase
-                    // show error to user
-                    Toast.makeText(getApplicationContext(), "Error : Invalid Purchase", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                // else purchase is valid
-                //if item is purchased and not acknowledged
-                if (!purchase.isAcknowledged()) {
-                    AcknowledgePurchaseParams acknowledgePurchaseParams =
-                            AcknowledgePurchaseParams.newBuilder()
-                                    .setPurchaseToken(purchase.getPurchaseToken())
-                                    .build();
-                    billingClient.acknowledgePurchase(acknowledgePurchaseParams, ackPurchase);
-                }
-                //else item is purchased and also acknowledged
-                else {
-                    // Grant entitlement to the user on item purchase
-                    // restart activity
-                    if (!getPurchaseValueFromPref()) {
-                        savePurchaseValueToPref(true);
-                        Toast.makeText(getApplicationContext(), "Item Purchased", Toast.LENGTH_SHORT).show();
-                        this.recreate();
+            final int index=subcribeItemIDs.indexOf(purchase.getSkus());
+            //purchase found
+            if(index>-1) {
+
+                //if item is purchased
+                if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED)
+                {
+                    if (!verifyValidSignature(purchase.getOriginalJson(), purchase.getSignature())) {
+                        // Invalid purchase
+                        // show error to user
+                        Toast.makeText(getApplicationContext(), "Error : Invalid Purchase", Toast.LENGTH_SHORT).show();
+                        continue;//skip current iteration only because other items in purchase list must be checked if present
+                    }
+                    // else purchase is valid
+                    //if item is purchased/subscribed and not Acknowledged
+                    if (!purchase.isAcknowledged()) {
+                        AcknowledgePurchaseParams acknowledgePurchaseParams =
+                                AcknowledgePurchaseParams.newBuilder()
+                                        .setPurchaseToken(purchase.getPurchaseToken())
+                                        .build();
+
+                        billingClient.acknowledgePurchase(acknowledgePurchaseParams,
+                                new AcknowledgePurchaseResponseListener() {
+                                    @Override
+                                    public void onAcknowledgePurchaseResponse(BillingResult billingResult) {
+                                        if(billingResult.getResponseCode()==BillingClient.BillingResponseCode.OK){
+                                            //if purchase is acknowledged
+                                            //then saved value in preference
+                                            saveSubscribeItemValueToPref(subcribeItemIDs.get(index),true);
+                                            Toast.makeText(getApplicationContext(), subcribeItemIDs.get(index)+" Item Subscribed", Toast.LENGTH_SHORT).show();
+                                            notifyList();
+                                        }
+                                    }
+                                });
+
+                    }
+                    //else item is purchased and also acknowledged
+                    else {
+                        // Grant entitlement to the user on item purchase
+                        if(!getSubscribeItemValueFromPref(subcribeItemIDs.get(index))){
+                            saveSubscribeItemValueToPref(subcribeItemIDs.get(index),true);
+                            Toast.makeText(getApplicationContext(), subcribeItemIDs.get(index)+" Item Subscribed.", Toast.LENGTH_SHORT).show();
+                            notifyList();
+                        }
                     }
                 }
+                //if purchase is pending
+                else if(  purchase.getPurchaseState() == Purchase.PurchaseState.PENDING)
+                {
+                    Toast.makeText(getApplicationContext(),
+                            subcribeItemIDs.get(index)+" Purchase is Pending. Please complete Transaction", Toast.LENGTH_SHORT).show();
+                }
+                //if purchase is refunded or unknown
+                else if( purchase.getPurchaseState() == Purchase.PurchaseState.UNSPECIFIED_STATE)
+                {
+                    //mark purchase false in case of UNSPECIFIED_STATE
+                    saveSubscribeItemValueToPref(subcribeItemIDs.get(index),false);
+                    Toast.makeText(getApplicationContext(), subcribeItemIDs.get(index)+" Purchase Status Unknown", Toast.LENGTH_SHORT).show();
+                    notifyList();
+                }
             }
-            //if purchase is pending
-            else if (PRODUCT_ID.equals(purchase.getSkus().get(0)) && purchase.getPurchaseState() == Purchase.PurchaseState.PENDING) {
-                Toast.makeText(getApplicationContext(),
-                        "Purchase is Pending. Please complete Transaction", Toast.LENGTH_SHORT).show();
-            }
-            //if purchase is unknown
-            else if (PRODUCT_ID.equals(purchase.getSkus().get(0)) && purchase.getPurchaseState() == Purchase.PurchaseState.UNSPECIFIED_STATE) {
-                savePurchaseValueToPref(false);
-                textStatus.setText(getResources().getString(R.string.status_not_purchased));
-                btnUpgrade.setVisibility(View.VISIBLE);
-                Toast.makeText(getApplicationContext(), "Purchase Status Unknown", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
 
-    AcknowledgePurchaseResponseListener ackPurchase = new AcknowledgePurchaseResponseListener() {
-        @Override
-        public void onAcknowledgePurchaseResponse(BillingResult billingResult) {
-            if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                //if purchase is acknowledged
-                // Grant entitlement to the user. and restart activity
-                savePurchaseValueToPref(true);
-                Toast.makeText(getApplicationContext(), "Item Purchased", Toast.LENGTH_SHORT).show();
-                MainActivity.this.recreate();
-            }
         }
-    };
+
+    }
 
 
     /**
@@ -332,7 +394,11 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
      */
     private boolean verifyValidSignature(String signedData, String signature) {
         try {
+            //for old playconsole
             // To get key go to Developer Console > Select your app > Development Tools > Services & APIs.
+            //for new play console
+            //To get key go to Developer Console > Select your app > Monetize > Monetization setup
+
             String base64Key = getResources().getString(R.string.play_console_license_key);
             return Security.verifyPurchase(base64Key, signedData, signature);
         } catch (IOException e) {
@@ -343,7 +409,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (billingClient != null) {
+        if(billingClient!=null){
             billingClient.endConnection();
         }
     }
