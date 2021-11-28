@@ -1,24 +1,15 @@
 package com.billing.inappbillingtest;
 
-
-import static com.android.billingclient.api.BillingClient.SkuType.INAPP;
-import static com.android.billingclient.api.BillingClient.SkuType.SUBS;
-
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.android.billingclient.api.AcknowledgePurchaseParams;
 import com.android.billingclient.api.AcknowledgePurchaseResponseListener;
 import com.android.billingclient.api.BillingClient;
@@ -30,102 +21,35 @@ import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.SkuDetails;
 import com.android.billingclient.api.SkuDetailsParams;
 import com.android.billingclient.api.SkuDetailsResponseListener;
-import com.billing.inappbillingtest.databinding.ActivityMainBinding;
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdSize;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.android.billingclient.api.BillingClient.SkuType.SUBS;
 
 public class MainActivity extends AppCompatActivity implements PurchasesUpdatedListener {
 
-    View hiddenView;
-    ImageView lock_key;
-    AdView removeAd;
-    ActivityMainBinding binding;
-    TextView textStatus,productName,productDescription,productPrice;
-    Button btnSubscribe, btnUpgrade;
-    private BillingClient billingClient;
-    public static final String PREF_FILE = "MyPref";
+    public static final String PREF_FILE= "MyPref";
+    //note add unique product ids
+    //use same id for preference key
     private static ArrayList<String> subcribeItemIDs = new ArrayList<String>() {{
-        add("js_1_month");
-        add("js_6_months");
-        add("js_12_months");
+        add("s1");
+        add("s2");
+        add("s3");
     }};
     private static ArrayList<String> subscribeItemDisplay = new ArrayList<String>();
     ArrayAdapter<String> arrayAdapter;
     ListView listView;
 
+    private BillingClient billingClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        AdView adView = new AdView(this);
-        adView.setAdSize(AdSize.BANNER);
-        adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
-        //binding
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-        //all the code bellow here
-        //ID
-        hiddenView = (View) findViewById(R.id.hidden_view);
-        lock_key = (ImageView) findViewById(R.id.lock_key);
-        removeAd = (AdView) findViewById(R.id.adView);
-        //list view
-        listView = findViewById(R.id.listView);
-        //billing id
-        textStatus = findViewById(R.id.tv_premium);
-        productName = findViewById(R.id.productName);
-        productDescription = findViewById(R.id.productDescription);
-        productPrice = findViewById(R.id.productPrice);
-        btnSubscribe = findViewById(R.id.btn_subscribe);
-        btnUpgrade = findViewById(R.id.btnUpgrade);
-        //load ads
-        AdRequest adRequest = new AdRequest.Builder().build();
-        removeAd.loadAd(adRequest);
-        //initialize ads
-        MobileAds.initialize(this, new OnInitializationCompleteListener() {
-            @Override
-            public void onInitializationComplete(@NonNull InitializationStatus initializationStatus) {
+        setContentView(R.layout.activity_main);
 
-            }
-        });
-        //ad listener
-        removeAd.setAdListener(new AdListener() {
-            @Override
-            public void onAdLoaded() {
-                // Code to be executed when an ad finishes loading.
-            }
+        listView=(ListView) findViewById(R.id.listview);
 
-            @Override
-            public void onAdFailedToLoad(LoadAdError adError) {
-                // Code to be executed when an ad request fails.
-            }
-
-            @Override
-            public void onAdOpened() {
-                // Code to be executed when an ad opens an overlay that
-                // covers the screen.
-            }
-
-            @Override
-            public void onAdClicked() {
-                // Code to be executed when the user clicks on an ad.
-            }
-
-            @Override
-            public void onAdClosed() {
-                // Code to be executed when the user is about to return
-                // to the app after tapping on an ad.
-            }
-        });
         // Establish connection to billing client
         //check purchase status from google play store cache on every app start
         billingClient = BillingClient.newBuilder(this)
@@ -228,10 +152,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
                 }
             }
         });
-
-    }//end of OnCreate
-
-    //other codes bellow here
+    }
 
     private void notifyList(){
         subscribeItemDisplay.clear();
@@ -319,7 +240,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
     void handlePurchases(List<Purchase>  purchases) {
         for(Purchase purchase:purchases) {
 
-            final int index=subcribeItemIDs.indexOf(purchase.getSkus());
+            final int index=subcribeItemIDs.indexOf(purchase.getSku());
             //purchase found
             if(index>-1) {
 
@@ -399,7 +320,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
             //for new play console
             //To get key go to Developer Console > Select your app > Monetize > Monetization setup
 
-            String base64Key = getResources().getString(R.string.play_console_license_key);
+            String base64Key = "Add your key here";
             return Security.verifyPurchase(base64Key, signedData, signature);
         } catch (IOException e) {
             return false;
