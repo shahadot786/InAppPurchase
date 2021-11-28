@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
     TextView textStatus;
     View lockView;
     ImageView ic_lock_premium_key;
-    AdView adView;
+    AdView adRemove;
     Button subscribe;
 
     private BillingClient billingClient;
@@ -57,9 +57,10 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
         textStatus = (TextView) findViewById(R.id.textStatus);
         lockView = (View) findViewById(R.id.lockView);
         ic_lock_premium_key = (ImageView) findViewById(R.id.ic_lock_premium_key);
-        adView = (AdView) findViewById(R.id.adView);
+        adRemove = (AdView) findViewById(R.id.adView);
         subscribe=(Button) findViewById(R.id.btnSubscribe);
         //ad declarations
+        AdView adView = new AdView(this);
         adView.setAdSize(AdSize.BANNER);
         adView.setAdUnitId(getResources().getString(R.string.ad_unit_id));
         //load ad
@@ -233,7 +234,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
             subscribe.setVisibility(View.GONE);
             lockView.setVisibility(View.GONE);
             ic_lock_premium_key.setVisibility(View.GONE);
-            adView.setVisibility(View.GONE);
+            adRemove.setVisibility(View.GONE);
             textStatus.setText(getResources().getString(R.string.upgrade_premium));
         }
         //if item already subscribed then check and reflect changes
@@ -301,7 +302,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
                 subscribe.setVisibility(View.VISIBLE);
                 lockView.setVisibility(View.VISIBLE);
                 ic_lock_premium_key.setVisibility(View.VISIBLE);
-                adView.setVisibility(View.VISIBLE);
+                adRemove.setVisibility(View.VISIBLE);
                 textStatus.setText(getResources().getString(R.string.free_content));
                 Toast.makeText(getApplicationContext(), "Purchase Status Unknown", Toast.LENGTH_SHORT).show();
             }
