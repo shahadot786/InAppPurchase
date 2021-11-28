@@ -17,6 +17,7 @@ import com.android.billingclient.api.BillingClientStateListener;
 import com.android.billingclient.api.BillingFlowParams;
 import com.android.billingclient.api.BillingResult;
 import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.PurchasesResponseListener;
 import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.SkuDetails;
 import com.android.billingclient.api.SkuDetailsParams;
@@ -33,9 +34,9 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
     //note add unique product ids
     //use same id for preference key
     private static ArrayList<String> subcribeItemIDs = new ArrayList<String>() {{
-        add("s1");
-        add("s2");
-        add("s3");
+        add("js_1_month");
+        add("subscription");
+        add("test_subscribtion");
     }};
     private static ArrayList<String> subscribeItemDisplay = new ArrayList<String>();
     ArrayAdapter<String> arrayAdapter;
@@ -59,51 +60,56 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
             public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
 
                 if(billingResult.getResponseCode()==BillingClient.BillingResponseCode.OK){
-                    Purchase.PurchasesResult queryPurchase = billingClient.queryPurchases(SUBS);
-                    List<Purchase> queryPurchases = queryPurchase.getPurchasesList();
-                    if(queryPurchases!=null && queryPurchases.size()>0){
-                        handlePurchases(queryPurchases);
-                    }
+                   billingClient.queryPurchasesAsync(SUBS, new PurchasesResponseListener() {
+                       @Override
+                       public void onQueryPurchasesResponse(@NonNull BillingResult billingResult, @NonNull List<Purchase> myPurchase) {
+                           if (!myPurchase.isEmpty()){
+                               handlePurchases(myPurchase);
+                           }
 
-                    //check which items are in purchase list and which are not in purchase list
-                    //if items that are found add them to purchaseFound
-                    //check status of found items and save values to preference
-                    //item which are not found simply save false values to their preference
-                    //indexOf return index of item in purchase list from 0-2 (because we have 3 items) else returns -1 if not found
-                    ArrayList<Integer> purchaseFound =new ArrayList<Integer> ();
-                    if(queryPurchases!=null && queryPurchases.size()>0){
-                        //check item in purchase list
-                        for(Purchase p:queryPurchases){
-                            int index=subcribeItemIDs.indexOf(p.getSkus());
-                            //if purchase found
-                            if(index>-1)
-                            {
-                                purchaseFound.add(index);
-                                if(p.getPurchaseState() == Purchase.PurchaseState.PURCHASED)
-                                {
-                                    saveSubscribeItemValueToPref(subcribeItemIDs.get(index),true);
-                                }
-                                else{
-                                    saveSubscribeItemValueToPref(subcribeItemIDs.get(index),false);
-                                }
-                            }
-                        }
-                        //items that are not found in purchase list mark false
-                        //indexOf returns -1 when item is not in foundlist
-                        for(int i=0;i < subcribeItemIDs.size(); i++){
-                            if(purchaseFound.indexOf(i)==-1){
-                                saveSubscribeItemValueToPref(subcribeItemIDs.get(i),false);
-                            }
-                        }
-                    }
-                    //if purchase list is empty that means no item is not purchased/Subscribed
-                    //Or purchase is refunded or canceled
-                    //so mark them all false
-                    else{
-                        for( String purchaseItem: subcribeItemIDs ){
-                            saveSubscribeItemValueToPref(purchaseItem,false);
-                        }
-                    }
+                           //check which items are in purchase list and which are not in purchase list
+                           //if items that are found add them to purchaseFound
+                           //check status of found items and save values to preference
+                           //item which are not found simply save false values to their preference
+                           //indexOf return index of item in purchase list from 0-2 (because we have 3 items) else returns -1 if not found
+                           ArrayList<Integer> purchaseFound =new ArrayList<Integer> ();
+                           if(!myPurchase.isEmpty()){
+                               //check item in purchase list
+                               for(Purchase p:myPurchase){
+                                   int index=subcribeItemIDs.indexOf(p.getSkus());
+                                   //if purchase found
+                                   if(index>-1)
+                                   {
+                                       purchaseFound.add(index);
+                                       if(p.getPurchaseState() == Purchase.PurchaseState.PURCHASED)
+                                       {
+                                           saveSubscribeItemValueToPref(subcribeItemIDs.get(index),true);
+                                       }
+                                       else{
+                                           saveSubscribeItemValueToPref(subcribeItemIDs.get(index),false);
+                                       }
+                                   }
+                               }
+                               //items that are not found in purchase list mark false
+                               //indexOf returns -1 when item is not in foundlist
+                               for(int i=0;i < subcribeItemIDs.size(); i++){
+                                   if(purchaseFound.indexOf(i)==-1){
+                                       saveSubscribeItemValueToPref(subcribeItemIDs.get(i),false);
+                                   }
+                               }
+                           }
+                           //if purchase list is empty that means no item is not purchased/Subscribed
+                           //Or purchase is refunded or canceled
+                           //so mark them all false
+                           else{
+                               for( String purchaseItem: subcribeItemIDs ){
+                                   saveSubscribeItemValueToPref(purchaseItem,false);
+                               }
+                           }
+
+
+                       }
+                   });
 
                 }
 
@@ -222,11 +228,16 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
         }
         //if item already purchased then check and reflect changes
         else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
-            Purchase.PurchasesResult queryAlreadyPurchasesResult = billingClient.queryPurchases(SUBS);
-            List<Purchase> alreadyPurchases = queryAlreadyPurchasesResult.getPurchasesList();
-            if(alreadyPurchases!=null){
-                handlePurchases(alreadyPurchases);
-            }
+            billingClient.queryPurchasesAsync(SUBS, new PurchasesResponseListener() {
+                @Override
+                public void onQueryPurchasesResponse(@NonNull BillingResult billingResult, @NonNull List<Purchase> alreadyPurchases) {
+                    if(!alreadyPurchases.isEmpty()){
+                        handlePurchases(alreadyPurchases);
+                    }
+                }
+            });
+
+
         }
         //if purchase cancelled
         else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
@@ -240,7 +251,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
     void handlePurchases(List<Purchase>  purchases) {
         for(Purchase purchase:purchases) {
 
-            final int index=subcribeItemIDs.indexOf(purchase.getSku());
+            final int index=subcribeItemIDs.indexOf(purchase.getSkus());
             //purchase found
             if(index>-1) {
 
@@ -320,7 +331,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
             //for new play console
             //To get key go to Developer Console > Select your app > Monetize > Monetization setup
 
-            String base64Key = "Add your key here";
+            String base64Key = getResources().getString(R.string.play_console_license_key);
             return Security.verifyPurchase(base64Key, signedData, signature);
         } catch (IOException e) {
             return false;
