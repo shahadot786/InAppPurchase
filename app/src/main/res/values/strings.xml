@@ -5,7 +5,8 @@
     <string name="copyright">Copyright © 2021 SHR_Creation. \nAll right reserved</string>
     <string name="google_in_app_purchase">Google In App Purchase</string>
     <string name="banner_ad">Banner Ad</string>
-    <string name="buy">Upgrade</string>
+    <string name="app_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="buy">Upgrade to pro</string>
     <string name="status_purchased">Status : Purchased</string>
     <string name="status_not_purchased">Status : Not Purchased</string>
     <string name="remove_ad">Remove Ad</string>
@@ -14,6 +15,15 @@
     <string name="product_name">Product Name:</string>
     <string name="product_description">Product Description:</string>
     <string name="product_price">Product Price:</string>
+    <string name="successful_purchase_message">Successfully Upgrade to Premium Version</string>
+    <string name="error">Error</string>
+    <string name="purchase_item_not_found">Purchase Item not Found</string>
+    <string name="purchase_canceled">Purchase Canceled</string>
+    <string name="invalid_purchased">Error : Invalid Purchase</string>
+    <string name="item_purchased">Item Purchased</string>
+    <string name="pending_purchased">Purchase is Pending. Please complete Transaction</string>
+    <string name="purchase_status_unknown">Purchase Status Unknown</string>
+
 
 
 </resources>

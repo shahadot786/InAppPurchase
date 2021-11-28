@@ -40,8 +40,8 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
-        app:adSize="BANNER"
         android:visibility="visible"
+        app:adSize="BANNER"
         app:adUnitId="ca-app-pub-3940256099942544/6300978111"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -101,9 +101,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:text=""
         android:textSize="16sp"
         android:textStyle="bold"
-        android:text=""
         app:layout_constraintEnd_toEndOf="@+id/productName"
         app:layout_constraintStart_toStartOf="@+id/productName"
         app:layout_constraintTop_toBottomOf="@+id/productName" />
@@ -113,9 +113,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:text=""
         android:textSize="16sp"
         android:textStyle="bold"
-        android:text=""
         app:layout_constraintEnd_toEndOf="@+id/productDescription"
         app:layout_constraintStart_toStartOf="@+id/productDescription"
         app:layout_constraintTop_toBottomOf="@+id/productDescription" />
@@ -124,34 +124,24 @@
         android:id="@+id/btnUpgrade"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:text="@string/buy"
-        app:layout_constraintBottom_toTopOf="@+id/btn_subscribe"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/btn_subscribe"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
-        android:text="@string/subscribe"
+        android:text="@string/buy"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/tv_premium"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text=""
+        android:layout_marginBottom="24dp"
         android:textSize="18sp"
         android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/btnUpgrade"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_subscribe" />
-
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
