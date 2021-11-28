@@ -169,6 +169,10 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
         //if item subscribed
         if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && purchases != null) {
             handlePurchases(purchases);
+            //other codes
+            subscribe.setVisibility(View.GONE);
+            premiumContent.setVisibility(View.VISIBLE);
+            subscriptionStatus.setText("Subscription Status : Subscribed");
         }
         //if item already subscribed then check and reflect changes
         else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED) {
@@ -178,10 +182,6 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
                 public void onQueryPurchasesResponse(@NonNull BillingResult billingResult, @NonNull List<Purchase> alreadyPurchases) {
                     if (!alreadyPurchases.isEmpty()){
                         handlePurchases(alreadyPurchases);
-                        //other codes
-                        subscribe.setVisibility(View.GONE);
-                        premiumContent.setVisibility(View.VISIBLE);
-                        subscriptionStatus.setText("Subscription Status : Subscribed");
                     }
                 }
             });
