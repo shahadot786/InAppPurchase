@@ -51,8 +51,8 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
     Button btnSubscribe, btnUpgrade;
     private BillingClient billingClient;
     public static final String PREF_FILE = "MyPref";
-    public static final String PURCHASE_KEY = "test_one";
-    public static final String PRODUCT_ID = "test_one";
+    public static final String PURCHASE_KEY = "test_three";
+    public static final String PRODUCT_ID = "test_three";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
                     List<Purchase> queryPurchases = queryPurchase.getPurchasesList();
                     if (queryPurchases != null && queryPurchases.size() > 0) {
                         handlePurchases(queryPurchases);
+
                     }
                     //if purchase list is empty that means item is not purchased
                     //Or purchase is refunded or canceled
@@ -138,6 +139,7 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
             public void onBillingServiceDisconnected() {
             }
         });
+
         //initiate purchase on button click
         btnUpgrade.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -204,6 +206,28 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
     private void savePurchaseValueToPref(boolean value) {
         getPreferenceEditObject().putBoolean(PURCHASE_KEY, value).commit();
     }
+
+    //get product details
+    /*private void getProductDetails(){
+        List<String> skuList = new ArrayList<>();
+        SkuDetailsParams.Builder params = SkuDetailsParams.newBuilder();
+        params.setSkusList(skuList).setType(INAPP);
+        billingClient.querySkuDetailsAsync(params.build(),
+                new SkuDetailsResponseListener() {
+                    @Override
+                    public void onSkuDetailsResponse(@NonNull BillingResult billingResult, @Nullable List<SkuDetails> list) {
+                        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                            if (list != null && list.size() > 0) {
+                                SkuDetails itemInfo = list.get(0);
+                                productName.setText(itemInfo.getTitle());
+                                productDescription.setText(itemInfo.getDescription());
+                                productPrice.setText(itemInfo.getPrice());
+                            }
+                        }
+                    }
+                });
+    }*/
+
 
     private void initiatePurchase() {
         List<String> skuList = new ArrayList<>();
