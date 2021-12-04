@@ -211,6 +211,9 @@ public class MainActivity extends AppCompatActivity implements PurchasesUpdatedL
                                     BillingFlowParams flowParams = BillingFlowParams.newBuilder()
                                             .setSkuDetails(skuDetailsList.get(0))
                                             .build();
+                                    //price info
+                                    //SkuDetails itemInfo = skuDetailsList.get(0);
+
                                     billingClient.launchBillingFlow(MainActivity.this, flowParams);
                                 } else {
                                     //try to add subscription item "sub_example" in google play console
